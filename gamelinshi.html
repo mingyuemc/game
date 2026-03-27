@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遨游汉字王国 - 错别字大侦探</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f9ff 0%, #e6f7ff 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0,102,202,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes correctAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background: #52c41a; color: white; }
+            100% { transform: scale(1); }
+        }
+        @keyframes wrongAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background: #faad14; color: white; }
+            100% { transform: scale(1); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes countdownPulse {
+            0% { transform: scale(1); color: #ff4500; }
+            100% { transform: scale(1.15); color: #e63946; }
+        }
+        @keyframes trophyBounce {
+            0%,100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-10deg); }
+            50% { transform: scale(1.3) rotate(0deg); }
+            75% { transform: scale(1.2) rotate(10deg); }
+        }
+        @keyframes confetti {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes winnerGlow {
+            0% { box-shadow: 0 0 10px gold; }
+            50% { box-shadow: 0 0 30px gold, 0 0 50px goldenrod; }
+            100% { box-shadow: 0 0 10px gold; }
+        }
+
+        .title {
+            text-align: center;
+            color: #c93737;
+            margin-bottom: 8px;
+            font-size: 28px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .rank-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #0066cc;
+            margin: 10px 0;
+        }
+
+        .rank-board {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .rank-item {
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid #eee;
+            transition: all 0.3s;
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        .rank1 { 
+            background: #fff2cc; 
+            border-color: #ffd700; 
+            color: #b8860b;
+            animation: winnerGlow 2s infinite ease-in-out;
+        }
+        .rank2 { background: #e6f7ff; border-color: #91d5ff; color: #0066cc; }
+        .rank3 { background: #f0f2f5; border-color: #d9d9d9; color: #666; }
+        .rank-other { background: #fafafa; color: #555; }
+
+        .draw-box {
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #fff1f1;
+            border-radius: 10px;
+            animation: fadeIn 0.6s ease;
+        }
+        .draw-text {
+            font-size: 26px;
+            font-weight: bold;
+            color: #e63946;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .countdown-box {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .countdown {
+            font-size: 36px;
+            font-weight: bold;
+            animation: countdownPulse 1s infinite alternate;
+        }
+
+        .page-info {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 17px;
+            color: #555;
+        }
+
+        .question-container {
+            border: 2px solid #0066cc;
+            border-radius: 12px;
+            padding: 30px 20px;
+            background: #f8fcff;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 160px;
+            animation: fadeIn 0.7s ease;
+        }
+
+        .question-text {
+            font-size: 24px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .error-word {
+            color: #ff0000;
+            font-weight: bold;
+            padding: 2px 5px;
+        }
+
+        .answer-box {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e6ffe6;
+            border-radius: 8px;
+            font-size: 20px;
+            color: #007700;
+            font-weight: bold;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .btn-start {
+            background: linear-gradient(90deg, #e63946, #c93737);
+            color: white;
+            padding: 18px 40px;
+            font-size: 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            margin: 40px auto;
+            display: block;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(230,57,70,0.3);
+            transition: 0.3s;
+        }
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(230,57,70,0.4);
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 22px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-prev { background: #8c8c8c; color: white; }
+        .btn-next { background: #1890ff; color: white; }
+        .btn-yes { background: #52c41a; color: white; display: none; }
+        .btn-no { background: #faad14; color: white; display: none; }
+        .btn-reset-all { background: #ff4d4f; color: white; margin-top:10px; }
+        .btn-show-answer { background: #1890ff; color: white; }
+
+        .tip {
+            text-align: center;
+            color: #888;
+            margin-top: 10px;
+            font-size: 15px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 30px;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .award-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .award-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 800px;
+            box-shadow: 0 0 50px rgba(255,215,0,0.5);
+        }
+
+        .award-title {
+            font-size: 42px;
+            color: #e63946;
+            margin-bottom: 20px;
+            font-weight: bold;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .winner-item {
+            margin: 12px 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .winner-1 { color: #ffd700; text-shadow: 0 0 10px gold; font-size: 36px; }
+        .winner-2 { color: #0066cc; font-size: 32px; }
+        .winner-3 { color: #666; font-size: 28px; }
+
+        .trophy-group {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .trophy {
+            font-size: 90px;
+            animation: trophyBounce 1.5s infinite ease-in-out;
+        }
+
+        .btn-restart {
+            background: linear-gradient(90deg, #1890ff, #0066cc);
+            color: white;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            opacity: 0;
+        }
+
+        .game-content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="award-modal" id="awardModal">
+    <div class="award-box">
+        <div class="award-title">🏆 颁奖典礼 🏆</div>
+        
+        <div class="trophy-group">
+            <div class="trophy">🥇</div>
+            <div class="trophy">🥈</div>
+            <div class="trophy">🥉</div>
+        </div>
+
+        <div id="winner1" class="winner-item winner-1"></div>
+        <div id="winner2" class="winner-item winner-2"></div>
+        <div id="winner3" class="winner-item winner-3"></div>
+
+        <div style="font-size: 20px; color: #666; margin:20px 0;">🎉 热烈祝贺获奖小组！</div>
+        <button class="btn btn-restart" onclick="restartGame()">🔄 重新开始游戏</button>
+    </div>
+</div>
+
+<div class="container">
+    <h1 class="title">遨游汉字王国——错别字大侦探</h1>
+    <p class="subtitle">天津市统编版五年级下册第三单元专项活动</p>
+
+    <button class="btn-start" id="startBtn" onclick="startGame()">▶ 开始游戏（自动抽人+倒计时）</button>
+
+    <div class="game-content" id="gameContent">
+        <div class="rank-title">🏆 小组实时排名</div>
+        <div class="rank-board" id="rank-board"></div>
+
+        <div class="draw-box">
+            <div class="draw-text" id="drawResult">🎯 等待抽取...</div>
+        </div>
+
+        <div class="countdown-box">
+            答题倒计时：<span class="countdown" id="countdown">10</span> 秒
+        </div>
+
+        <div class="page-info">当前：第 <span id="current-page">1</span> 题 / 共 20 题</div>
+        <div class="question-container">
+            <div class="question-text" id="question-content"></div>
+            <div class="answer-box" id="answer-box"></div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-prev" onclick="prevQuestion()">← 上一题</button>
+            <button class="btn btn-show-answer" id="showAnswerBtn" onclick="showAnswer()">📖 显示答案</button>
+            <button class="btn btn-yes" id="yesBtn" onclick="checkAnswer(true)">✅ 答对 +10分</button>
+            <button class="btn btn-no" id="noBtn" onclick="checkAnswer(false)">❌ 答错 -5分</button>
+            <button class="btn btn-next" onclick="nextQuestion()">下一题 →</button>
+        </div>
+
+        <div style="text-align:center;">
+            <button class="btn btn-reset-all" onclick="resetAll()">🔄 重置所有</button>
+        </div>
+
+        <p class="tip">💡 流程：开始 → 抽人 → 倒计时 → 显示答案 → 判分 → 自动下一题 → 颁奖</p>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { text: "1. 我们要认真学习，天天向上，不能<span class='error-word'>荒</span>废时间。", answer: "正确：荒 → 慌" },
+        { text: "2. 小明每天坚持锻<span class='error-word'>练</span>身体。", answer: "正确：练 → 炼（锻炼）" },
+        { text: "3. 春天来了，花儿竟<span class='error-word'>相</span>开放。", answer: "正确：相 → 先（竞相开放）" },
+        { text: "4. 我们要爱护公<span class='error-word'>圆</span>里的花草。", answer: "正确：圆 → 园（公园）" },
+        { text: "5. 同学们在教室里安<span class='error-word'>静</span>地看书。", answer: "正确！无错别字" },
+        { text: "6. 我吃了一<span class='error-word'>婉</span>香喷喷的米饭。", answer: "正确：婉 → 碗（一碗）" },
+        { text: "7. 我们要<span class='error-word'>尊</span>守学校的规章制度。", answer: "正确：尊 → 遵（遵守）" },
+        { text: "8. 小鸟在树上<span class='error-word'>欢唱</span>，真好听。", answer: "正确！无错别字" },
+        { text: "9. 这件事让我感到十分<span class='error-word'>振</span>惊。", answer: "正确：振 → 震（震惊）" },
+        { text: "10. 我们要<span class='error-word'>克</span>服困难，努力学习。", answer: "正确！无错别字" },
+        { text: "11. 他<span class='error-word'>再</span>也不会迟到了。", answer: "正确！无错别字" },
+        { text: "12. 我<span class='error-word'>有</span>一颗爱心。", answer: "正确！无错别字" },
+        { text: "13. 老师<span class='error-word'>辛</span>苦了。", answer: "正确！无错别字" },
+        { text: "14. 今天天气<span class='error-word'>情</span>朗。", answer: "正确：情 → 晴（晴朗）" },
+        { text: "15. 我<span class='error-word'>座</span>在椅子上。", answer: "正确：座 → 坐（坐下）" },
+        { text: "16. 大家<span class='error-word'>玩</span>得很开心。", answer: "正确！无错别字" },
+        { text: "17. 我们要<span class='error-word'>向</span>雷锋学习。", answer: "正确！无错别字" },
+        { text: "18. 他<span class='error-word'>象</span>爸爸一样勇敢。", answer: "正确：象 → 像（好像）" },
+        { text: "19. 我<span class='error-word'>己</span>经长大了。", answer: "正确：己 → 已（已经）" },
+        { text: "20. 我们要<span class='error-word'>爱</span>护公物。", answer: "正确！无错别字" }
+    ];
+
+    let currentPage = 0;
+    let teams = [
+        { name: "第一小组", score: 0 },
+        { name: "第二小组", score: 0 },
+        { name: "第三小组", score: 0 },
+        { name: "第四小组", score: 0 },
+        { name: "第五小组", score: 0 }
+    ];
+    
+    let selectedTeam = null;
+    let selectedPerson = null;
+    let countdownTimer = null;
+    const toast = document.getElementById('toast');
+    const awardModal = document.getElementById('awardModal');
+
+    function startGame() {
+        document.getElementById("startBtn").style.display = "none";
+        document.getElementById("gameContent").style.display = "block";
+        nextQuestion();
+        updateRank();
+    }
+
+    function autoDraw() {
+        selectedTeam = Math.floor(Math.random() * 5);
+        selectedPerson = Math.floor(Math.random() * 2) + 1;
+        document.getElementById("drawResult").innerText = `🎯 ${teams[selectedTeam].name} — 第 ${selectedPerson} 名代表答题！`;
+    }
+
+    function startCountdown() {
+        clearInterval(countdownTimer);
+        let sec = 10;
+        const cd = document.getElementById("countdown");
+        cd.innerText = sec;
+
+        document.getElementById("yesBtn").style.display = "none";
+        document.getElementById("noBtn").style.display = "none";
+        document.getElementById("showAnswerBtn").style.display = "inline-block";
+        document.getElementById("answer-box").style.display = "none";
+
+        countdownTimer = setInterval(() => {
+            sec--;
+            cd.innerText = sec;
+            if (sec <= 0) {
+                clearInterval(countdownTimer);
+            }
+        }, 1000);
+    }
+
+    function showAnswer() {
+        document.getElementById("answer-box").style.display = "block";
+        document.getElementById("answer-box").innerHTML = questions[currentPage].answer;
+        document.getElementById("showAnswerBtn").style.display = "none";
+        document.getElementById("yesBtn").style.display = "inline-block";
+        document.getElementById("noBtn").style.display = "inline-block";
+    }
+
+    function showQuestion() {
+        document.getElementById("question-content").innerHTML = questions[currentPage].text;
+        document.getElementById("current-page").textContent = currentPage + 1;
+        autoDraw();
+        startCountdown();
+    }
+
+    function checkAnswer(isCorrect) {
+        clearInterval(countdownTimer);
+        
+        if (isCorrect) {
+            teams[selectedTeam].score += 10;
+            document.getElementById("yesBtn").style.animation = "correctAnim 0.6s ease";
+        } else {
+            teams[selectedTeam].score -= 5;
+            document.getElementById("noBtn").style.animation = "wrongAnim 0.6s ease";
+        }
+        
+        updateRank();
+        
+        setTimeout(() => {
+            if (currentPage === questions.length - 1) {
+                setTimeout(showAward, 1000);
+            } else {
+                nextQuestion();
+            }
+            document.getElementById("yesBtn").style.animation = "";
+            document.getElementById("noBtn").style.animation = "";
+        }, 900);
+    }
+
+    function updateRank() {
+        let sorted = [...teams].sort((a, b) => b.score - a.score);
+        let board = document.getElementById("rank-board");
+        board.innerHTML = "";
+
+        sorted.forEach((item, index) => {
+            let div = document.createElement("div");
+            div.className = "rank-item " + (index === 0 ? "rank1" : index === 1 ? "rank2" : index === 2 ? "rank3" : "rank-other");
+            let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : (index+1)+"名";
+            div.innerHTML = `<div>${medal} ${item.name}</div><div>${item.score} 分</div>`;
+            board.appendChild(div);
+        });
+    }
+
+    function nextQuestion() {
+        if (currentPage < questions.length - 1) { currentPage++; showQuestion(); }
+    }
+    function prevQuestion() {
+        if (currentPage > 0) { currentPage--; showQuestion(); }
+    }
+
+    function showAward() {
+        let sorted = [...teams].sort((a, b) => b.score - a.score);
+        
+        document.getElementById("winner1").innerText = `🥇 冠军：${sorted[0].name}（${sorted[0].score}分）`;
+        document.getElementById("winner2").innerText = `🥈 亚军：${sorted[1].name}（${sorted[1].score}分）`;
+        document.getElementById("winner3").innerText = `🥉 季军：${sorted[2].name}（${sorted[2].score}分）`;
+        
+        awardModal.style.display = "flex";
+        createConfetti();
+    }
+
+    function createConfetti() {
+        const colors = ['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff','#ff9900','#9900ff'];
+        for (let i=0; i<120; i++) {
+            let c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random()*100+'vw';
+            c.style.background = colors[Math.floor(Math.random()*colors.length)];
+            c.style.animation = `confetti ${3+Math.random()*2}s linear`;
+            document.body.appendChild(c);
+            setTimeout(()=>c.remove(), 5000);
+        }
+    }
+
+    function restartGame() {
+        awardModal.style.display = "none";
+        resetAll();
+    }
+
+    function resetAll() {
+        teams.forEach(t => t.score = 0);
+        currentPage = 0;
+        clearInterval(countdownTimer);
+        showQuestion();
+        updateRank();
+    }
+</script>
+</body>
+</html>
