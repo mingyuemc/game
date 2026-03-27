@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>截图放映厅（本地版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer; /* 提示可点击 */
+        }
+
+        /* 图片容器：大屏完美适配 */
+        #imgContainer {
+            max-width: 100vw;
+            max-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #slideImg {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: opacity 0.4s ease;
+        }
+
+        /* 加载/错误提示 */
+        #tipText {
+            color: #fff;
+            font-size: 28px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        /* 极简控制面板 */
+        .controls {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 12px 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 12px;
+            opacity: 0.7;
+            z-index: 10;
+        }
+
+        button {
+            background: #fff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #4299e1;
+            color: #fff;
+        }
+
+        #fullscreenBtn {
+            width: auto;
+            padding: 0 20px;
+            border-radius: 22px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="imgContainer">
+        <img id="slideImg" src="" alt="本地截图">
+        <div id="tipText">准备放映...</div>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn">◀</button>
+        <button id="fullscreenBtn">进入全屏</button>
+        <button id="nextBtn">▶</button>
+    </div>
+
+    <script>
+        // 本地图片配置（重点：图片和HTML文件同文件夹）
+        const imgBasePath = "./"; // 图片和HTML在同一文件夹
+        const imgPrefix = "png";  // 图片前缀
+        const startNum = 1;       // 起始编号
+        const endNum = 32;        // 结束编号
+        let currentIndex = startNum;
+
+        // 获取元素
+        const imgElement = document.getElementById("slideImg");
+        const tipText = document.getElementById("tipText");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+        // 加载本地图片（带错误提示）
+        function loadImage() {
+            tipText.textContent = `加载第 ${currentIndex} 张...`;
+            imgElement.style.opacity = 0;
+
+            // 本地图片路径：./png1.png、./png2.png...
+            const imgUrl = `${imgBasePath}${imgPrefix}${currentIndex}.png`;
+            
+            // 验证图片是否存在
+            const tempImg = new Image();
+            tempImg.src = imgUrl;
+
+            // 加载成功
+            tempImg.onload = function() {
+                imgElement.src = imgUrl;
+                imgElement.style.opacity = 1;
+                tipText.style.display = "none"; // 隐藏提示
+            };
+
+            // 加载失败（本地图片找不到）
+            tempImg.onerror = function() {
+                tipText.textContent = `❌ 第 ${currentIndex} 张图片缺失\n请检查文件：${imgUrl}`;
+                tipText.style.display = "block";
+                imgElement.style.opacity = 0;
+            };
+        }
+
+        // 下一张（点击屏幕触发）
+        function nextSlide() {
+            currentIndex = currentIndex >= endNum ? startNum : currentIndex + 1;
+            loadImage();
+        }
+
+        // 上一张
+        function prevSlide() {
+            currentIndex = currentIndex <= startNum ? endNum : currentIndex - 1;
+            loadImage();
+        }
+
+        // 点击屏幕任意位置切下一张（避开按钮区）
+        document.body.addEventListener("click", (e) => {
+            if (!e.target.closest(".controls")) {
+                nextSlide();
+            }
+        });
+
+        // 全屏功能（适配学校大屏）
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert("全屏失败，可手动按 F11 进入全屏");
+                });
+                fullscreenBtn.textContent = "退出全屏";
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.textContent = "进入全屏";
+            }
+        }
+
+        // 键盘控制（大屏操作更方便）
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft") prevSlide();   // 左箭头：上一张
+            if (e.key === "ArrowRight") nextSlide(); // 右箭头：下一张
+            if (e.key === " ") nextSlide();          // 空格键：下一张
+            if (e.key === "F11") toggleFullscreen(); // F11：全屏/退出
+        });
+
+        // 按钮绑定
+        prevBtn.addEventListener("click", prevSlide);
+        nextBtn.addEventListener("click", nextSlide);
+        fullscreenBtn.addEventListener("click", toggleFullscreen);
+
+        // 初始化加载第一张
+        loadImage();
+    </script>
+</body>
+</html>
