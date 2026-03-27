@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>联机测试</title>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        input, button { padding: 10px; margin: 5px; }
+        .room-code { font-size: 24px; font-weight: bold; color: #ff4c4c; }
+        #players { margin-top: 20px; text-align: left; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>🎮 逃离物理卷联机测试</h1>
+    
+    <div id="create-panel">
+        <input type="text" id="player-name" placeholder="你的名字" value="玩家">
+        <button id="create-btn">创建房间</button>
+        <button id="join-btn">加入房间</button>
+    </div>
+    
+    <div id="join-panel" style="display:none;">
+        <input type="text" id="room-code" placeholder="输入6位房间码" maxlength="6">
+        <button id="connect-btn">连接</button>
+        <button id="back-btn">返回</button>
+    </div>
+    
+    <div id="room-panel" style="display:none;">
+        <div>房间码: <span id="room-display" class="room-code"></span></div>
+        <button id="copy-btn">📋 复制房间码</button>
+        <button id="leave-btn">🚪 离开房间</button>
+        <div id="players"></div>
+        <p style="color:green" id="status">✅ 已连接</p>
+    </div>
+    
+    <div id="connecting" style="display:none;">
+        <p>⏳ 连接中...</p>
+    </div>
+
+    <script>
+        let peer = null;
+        let connections = [];
+        let players = new Map();
+        let myId = null;
+        let roomId = null;
+        let isHost = false;
+        
+        function generateRoomCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+        
+        function updatePlayers() {
+            const div = document.getElementById('players');
+            let html = '<h3>👥 房间成员</h3>';
+            players.forEach(p => {
+                html += `<div>${p.name} ${p.isHost ? '👑' : ''}</div>`;
+            });
+            div.innerHTML = html;
+        }
+        
+        function broadcast(data) {
+            connections.forEach(conn => {
+                try { conn.send(data); } catch(e) {}
+            });
+        }
+        
+        // 创建房间
+        document.getElementById('create-btn').onclick = () => {
+            const name = document.getElementById('player-name').value || '玩家';
+            roomId = generateRoomCode();
+            isHost = true;
+            
+            document.getElementById('connecting').style.display = 'block';
+            document.getElementById('create-panel').style.display = 'none';
+            
+            peer = new Peer(roomId);
+            
+            peer.on('open', (id) => {
+                myId = id;
+                players.set(id, { name: name + ' (房主)', isHost: true });
+                updatePlayers();
+                
+                document.getElementById('connecting').style.display = 'none';
+                document.getElementById('room-panel').style.display = 'block';
+                document.getElementById('room-display').innerText = roomId;
+            });
+            
+            peer.on('connection', (conn) => {
+                connections.push(conn);
+                conn.on('data', (data) => {
+                    if (data.type === 'player-info') {
+                        players.set(data.id, { name: data.name, isHost: false });
+                        updatePlayers();
+                        // 广播新玩家给所有人
+                        broadcast({ type: 'player-info', id: data.id, name: data.name });
+                    }
+                });
+                conn.send({ type: 'player-info', id: myId, name: name });
+            });
+            
+            peer.on('error', (err) => {
+                alert('创建失败: ' + err.message);
+                location.reload();
+            });
+        };
+        
+        // 加入房间
+        document.getElementById('join-btn').onclick = () => {
+            document.getElementById('create-panel').style.display = 'none';
+            document.getElementById('join-panel').style.display = 'block';
+        };
+        
+        document.getElementById('connect-btn').onclick = () => {
+            const code = document.getElementById('room-code').value.trim().toUpperCase();
+            if (!code || code.length !== 6) {
+                alert('请输入6位房间码');
+                return;
+            }
+            
+            const name = document.getElementById('player-name').value || '玩家';
+            roomId = code;
+            
+            document.getElementById('connecting').style.display = 'block';
+            document.getElementById('join-panel').style.display = 'none';
+            
+            peer = new Peer();
+            
+            peer.on('open', (id) => {
+                myId = id;
+                players.set(id, { name: name, isHost: false });
+                
+                const conn = peer.connect(roomId);
+                connections.push(conn);
+                
+                conn.on('open', () => {
+                    conn.send({ type: 'player-info', id: myId, name: name });
+                    
+                    document.getElementById('connecting').style.display = 'none';
+                    document.getElementById('room-panel').style.display = 'block';
+                    document.getElementById('room-display').innerText = roomId;
+                });
+                
+                conn.on('data', (data) => {
+                    if (data.type === 'player-info') {
+                        players.set(data.id, { name: data.name, isHost: data.id === roomId });
+                        updatePlayers();
+                    }
+                });
+            });
+            
+            peer.on('error', (err) => {
+                alert('连接失败: ' + err.message);
+                location.reload();
+            });
+        };
+        
+        document.getElementById('back-btn').onclick = () => {
+            document.getElementById('join-panel').style.display = 'none';
+            document.getElementById('create-panel').style.display = 'block';
+        };
+        
+        document.getElementById('copy-btn').onclick = () => {
+            navigator.clipboard.writeText(roomId);
+            alert('房间码已复制: ' + roomId);
+        };
+        
+        document.getElementById('leave-btn').onclick = () => {
+            if (peer) peer.destroy();
+            location.reload();
+        };
+    </script>
+</body>
+</html>
