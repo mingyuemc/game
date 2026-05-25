@@ -1,199 +1,458 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎮 即点即玩 · 免登录游戏站 (多人+单人)</title>
     <style>
-        /* ----- 全局重置 & 柔光基底 ----- */
+        :root {
+            --bg-start: #e8eef5;
+            --bg-mid: #dce5f0;
+            --bg-end: #c9d5e8;
+            --card-bg: rgba(255, 255, 255, 0.72);
+            --card-hover-bg: rgba(255, 255, 255, 0.9);
+            --text-primary: #1a2f44;
+            --text-secondary: #3d5570;
+            --accent-blue: #3b6fa0;
+            --accent-purple: #6b5b9e;
+            --accent-pink: #c94f7c;
+            --accent-teal: #2d8a7b;
+            --accent-orange: #c8783b;
+            --geo-neon: #ff3cac;
+            --geo-cyan: #2bdee8;
+            --geo-purple: #7843e6;
+            --shadow-sm: 0 2px 8px rgba(15, 30, 55, 0.06);
+            --shadow-md: 0 12px 28px rgba(15, 30, 55, 0.1);
+            --shadow-lg: 0 24px 48px rgba(15, 30, 55, 0.16);
+            --shadow-xl: 0 32px 64px rgba(15, 30, 55, 0.22);
+            --radius-sm: 1.2rem;
+            --radius-md: 2rem;
+            --radius-lg: 3rem;
+            --radius-xl: 4rem;
+            --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
         }
 
         body {
-            background: radial-gradient(circle at 10% 30%, #e1e9f5, #ccd9e9);
+            background: linear-gradient(160deg, #e8eef5 0%, #dce5f0 20%, #d0daea 40%, #dfe6f2 60%, #c9d5e8 80%, #d5dff0 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 2rem 1.2rem;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* ----- 主容器（大毛玻璃）----- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%;
+            right: -8%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(120, 67, 230, 0.07) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -12%;
+            left: -6%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(43, 222, 232, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-geo {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.12;
+            animation: floatGeo 18s ease-in-out infinite;
+        }
+        .floating-geo.polygon1 {
+            top: 8%;
+            right: 12%;
+            width: 60px;
+            height: 60px;
+            background: var(--geo-purple);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            animation-delay: 0s;
+        }
+        .floating-geo.polygon2 {
+            bottom: 18%;
+            left: 8%;
+            width: 44px;
+            height: 44px;
+            background: var(--geo-cyan);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            animation-delay: -7s;
+        }
+        .floating-geo.polygon3 {
+            top: 35%;
+            left: 3%;
+            width: 36px;
+            height: 36px;
+            background: var(--geo-neon);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            animation-delay: -13s;
+        }
+
+        @keyframes floatGeo {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            25% {
+                transform: translateY(-25px) rotate(8deg) scale(1.08);
+            }
+            50% {
+                transform: translateY(-10px) rotate(-4deg) scale(0.94);
+            }
+            75% {
+                transform: translateY(-30px) rotate(3deg) scale(1.04);
+            }
+        }
+
         .no-login-hub {
             max-width: 1400px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-radius: 4rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: var(--radius-xl);
             padding: 3rem 2.5rem;
-            box-shadow: 0 30px 60px rgba(17, 30, 55, 0.2),
-                        0 12px 30px rgba(0, 0, 0, 0.05),
-                        inset 0 1px 3px rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: var(--shadow-xl),
+                inset 0 1px 3px rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
         }
 
-        /* ----- 头部 ----- */
         .header {
             text-align: center;
-            margin-bottom: 3.5rem;
+            margin-bottom: 3rem;
         }
-
         .header h1 {
             font-size: 3.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(145deg, #162b44, #1f3e64);
+            font-weight: 750;
+            letter-spacing: -0.03em;
+            background: linear-gradient(150deg, #152c46 0%, #1e3d5c 40%, #264b6e 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             display: inline-block;
             padding: 0 0.8rem;
-            text-shadow: 0 2px 8px rgba(0,30,60,0.1);
+            position: relative;
         }
-
-        h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(145deg, #162b44, #1f3e64);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            display: inline-block;
-            padding: 0 0.8rem;
-            text-shadow: 0 2px 8px rgba(0,30,60,0.1);
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 3px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, transparent, rgba(120, 67, 230, 0.4), rgba(43, 222, 232, 0.4), transparent);
         }
-
         .header .badge {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: 450;
-            background: rgba(255, 255, 245, 0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(255, 255, 248, 0.55);
+            backdrop-filter: blur(8px);
             color: #1a3f5c;
             display: inline-block;
             padding: 0.7rem 2.2rem;
             border-radius: 60px;
-            margin-top: 1rem;
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 6px 14px rgba(0, 20, 30, 0.05);
+            margin-top: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.01em;
         }
-
         .badge span {
-            font-weight: 600;
+            font-weight: 650;
             background: #1f4a6e;
             color: white;
-            padding: 0.2rem 1rem;
+            padding: 0.25rem 1.1rem;
             border-radius: 40px;
             margin-left: 0.6rem;
-            font-size: 1.2rem;
-            box-shadow: inset 0 1px 4px rgba(255,255,255,0.3);
+            font-size: 1.15rem;
+            box-shadow: inset 0 1px 4px rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.02em;
         }
 
-        /* ----- 网格：八个卡片 (已移除Game Jolt) ----- */
+        .section-title {
+            text-align: center;
+            margin: 0.8rem 0 2rem;
+        }
+        .section-title h2 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(145deg, #162b44, #1f3e64);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            padding: 0 1rem;
+            position: relative;
+        }
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 2px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, transparent, rgba(100, 140, 180, 0.5), transparent);
+        }
+
+        .section-block {
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 2.2rem 2rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            transition: all 0.3s ease;
+        }
+
         .game-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.2rem;
-            margin: 1rem 0 1.5rem;
+            gap: 1.8rem;
+            margin: 0.5rem 0 0.5rem;
         }
 
-        /* 卡片样式 */
         .card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 2.6rem;
-            padding: 2rem 1.8rem 1.8rem 1.8rem;
-            box-shadow: 0 18px 35px -10px rgba(10, 30, 50, 0.2);
-            transition: all 0.25s ease;
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--radius-md);
+            padding: 1.8rem 1.6rem 1.5rem 1.6rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-smooth);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(130, 170, 210, 0.4), rgba(160, 190, 225, 0.25), transparent);
+            border-radius: 3px 3px 0 0;
+            z-index: 2;
+            transition: var(--transition-smooth);
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            background: var(--card-hover-bg);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+        .card:hover::before {
+            background: linear-gradient(90deg, rgba(100, 150, 200, 0.7), rgba(140, 175, 215, 0.5), rgba(180, 200, 225, 0.2));
+            height: 4px;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.88);
-            box-shadow: 0 28px 45px -12px rgba(6, 30, 60, 0.3);
-            border-color: rgba(255,255,255,0.95);
+        .card.geo-dash-card {
+            border: 1.5px solid rgba(200, 160, 220, 0.5);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(250, 242, 255, 0.72) 40%, rgba(240, 248, 255, 0.7) 100%);
+            position: relative;
+        }
+        .card.geo-dash-card::before {
+            background: linear-gradient(90deg, #ff3cac, #7843e6, #2bdee8, #ff3cac);
+            background-size: 300% 100%;
+            height: 4px;
+            animation: geoShimmer 3s ease-in-out infinite;
+        }
+        .card.geo-dash-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255, 60, 172, 0.08) 0%, transparent 65%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .card.geo-dash-card:hover {
+            border-color: rgba(180, 130, 210, 0.7);
+            box-shadow: 0 22px 44px rgba(120, 60, 180, 0.2), 0 8px 16px rgba(43, 180, 220, 0.1);
+            transform: translateY(-12px);
+        }
+        .card.geo-dash-card:hover::before {
+            animation: geoShimmerFast 1.5s ease-in-out infinite;
+            height: 5px;
+        }
+
+        @keyframes geoShimmer {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        @keyframes geoShimmerFast {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .geo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: linear-gradient(135deg, #ff3cac30, #7843e630);
+            border: 1px solid rgba(200, 130, 210, 0.5);
+            color: #6b3080;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            letter-spacing: 0.03em;
+            animation: pulseBadge 2.5s ease-in-out infinite;
+        }
+        @keyframes pulseBadge {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(180, 100, 210, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(180, 100, 210, 0);
+            }
+        }
+        .geo-badge::before {
+            content: '💎';
+            font-size: 0.85rem;
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.2rem;
+            gap: 0.9rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
         }
-
         .icon-emojii {
-            font-size: 2.5rem;
-            background: rgba(235, 245, 255, 0.6);
-            width: 4rem;
-            height: 4rem;
-            border-radius: 1.8rem;
+            font-size: 2.4rem;
+            background: rgba(235, 245, 255, 0.55);
+            width: 3.8rem;
+            height: 3.8rem;
+            border-radius: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255,255,255,0.7);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(4px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.02);
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            transition: var(--transition-bounce);
+        }
+        .card:hover .icon-emojii {
+            transform: scale(1.08);
+            box-shadow: var(--shadow-md);
+        }
+        .geo-dash-card .icon-emojii {
+            background: linear-gradient(135deg, rgba(255, 60, 172, 0.15), rgba(120, 67, 230, 0.15));
+            border-color: rgba(200, 150, 220, 0.5);
+            font-size: 2.6rem;
         }
 
         .site-title {
-            font-size: 1.8rem;
-            font-weight: 600;
+            font-size: 1.65rem;
+            font-weight: 650;
             color: #10324e;
             line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+        .geo-dash-card .site-title {
+            background: linear-gradient(135deg, #5c2080, #8b3ab0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
         }
 
         .description {
-            color: #2e4a6b;
-            font-size: 1.02rem;
-            line-height: 1.5;
-            margin-bottom: 1.6rem;
+            color: #3d5570;
+            font-size: 0.98rem;
+            line-height: 1.55;
+            margin-bottom: 1.2rem;
             flex: 1;
-            padding-right: 0.3rem;
+            padding-right: 0.2rem;
+            position: relative;
+            z-index: 1;
         }
 
-        /* 标签组 */
         .feature-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 2rem;
+            gap: 0.5rem;
+            margin-bottom: 1.6rem;
+            position: relative;
+            z-index: 1;
         }
-
         .feature-tags .tag {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(115, 165, 215, 0.3);
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(115, 165, 215, 0.28);
             color: #105079;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 520;
-            padding: 0.3rem 1.1rem;
+            padding: 0.28rem 1rem;
             border-radius: 40px;
             backdrop-filter: blur(2px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: var(--transition-smooth);
+            white-space: nowrap;
         }
-
-        /* 免登录高亮标签 */
         .tag.nologin-highlight {
-            background: #1f543e20;
-            border-color: #2a8e5c50;
+            background: rgba(31, 84, 62, 0.1);
+            border-color: rgba(42, 142, 92, 0.35);
             color: #126e48;
-            font-weight: 550;
+            font-weight: 570;
         }
         .tag.nologin-highlight::before {
             content: "🚪 ";
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
-
-        /* 单人/多人专属标签样式 */
         .tag.single-player {
             background: #e0efff;
             border-color: #5f9cea;
@@ -202,9 +461,8 @@
         }
         .tag.single-player::before {
             content: "👤 ";
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
-
         .tag.multi-player {
             background: #ffe8d9;
             border-color: #f9a25c;
@@ -213,9 +471,8 @@
         }
         .tag.multi-player::before {
             content: "👥 ";
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
-
         .tag.mixed-player {
             background: #e5d9ff;
             border-color: #a27ce6;
@@ -224,59 +481,90 @@
         }
         .tag.mixed-player::before {
             content: "👤👥 ";
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .action-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.6rem;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(130, 180, 230, 0.35);
             backdrop-filter: blur(4px);
-            padding: 0.8rem 1.2rem;
+            padding: 0.7rem 1.1rem;
             border-radius: 3rem;
             text-decoration: none;
             font-weight: 560;
             color: #103962;
-            font-size: 1.1rem;
-            transition: 0.15s;
-            box-shadow: 0 6px 16px rgba(0, 30, 50, 0.08);
-            margin-top: 0.6rem;
+            font-size: 1rem;
+            transition: var(--transition-bounce);
+            box-shadow: var(--shadow-sm);
+            margin-top: 0.4rem;
             width: fit-content;
-            border: 1px solid rgba(130, 180, 230, 0.3);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.01em;
+            cursor: pointer;
         }
-
         .action-button:hover {
             background: white;
             border-color: #a0c6e9;
-            box-shadow: 0 10px 22px rgba(20, 80, 130, 0.15);
+            box-shadow: 0 10px 24px rgba(20, 80, 130, 0.16);
             color: #08263b;
+            transform: translateY(-2px);
         }
-
         .action-button .arrow {
-            font-size: 1.3rem;
-            transition: transform 0.2s;
+            font-size: 1.2rem;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block;
+        }
+        .action-button:hover .arrow {
+            transform: translateX(7px);
         }
 
-        .action-button:hover .arrow {
-            transform: translateX(6px);
+        .geo-dash-card .action-button {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(250, 240, 255, 0.85));
+            border-color: rgba(180, 130, 210, 0.5);
+            color: #5c2080;
+            font-weight: 600;
+        }
+        .geo-dash-card .action-button:hover {
+            background: white;
+            border-color: #c090dd;
+            box-shadow: 0 10px 24px rgba(120, 60, 180, 0.2);
+            color: #3d1060;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin-top: 0.2rem;
+            position: relative;
+            z-index: 1;
+        }
+        .button-group .action-button {
+            margin-top: 0;
+            font-size: 0.9rem;
+            padding: 0.6rem 0.95rem;
         }
 
         .foot-note {
             text-align: center;
-            margin-top: 3.2rem;
+            margin-top: 2.5rem;
             color: #3a5577;
-            font-size: 1rem;
+            font-size: 0.95rem;
             background: rgba(255, 255, 255, 0.4);
-            padding: 0.8rem 2rem;
+            padding: 0.75rem 2rem;
             border-radius: 60px;
             backdrop-filter: blur(5px);
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
-            border: 1px solid rgba(255,255,255,0.7);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.01em;
         }
         .foot-note strong {
             font-weight: 650;
@@ -285,347 +573,436 @@
             padding: 0.2rem 0.8rem;
             border-radius: 30px;
             margin: 0 0.3rem;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            letter-spacing: 0.02em;
         }
 
-        @media (max-width: 650px) {
-            .no-login-hub { padding: 2rem 1.2rem; border-radius: 2.5rem; }
-            .header h1 { font-size: 2.4rem; }
-            .site-title { font-size: 1.5rem; }
+        @media (max-width: 768px) {
+            .no-login-hub {
+                padding: 2rem 1.2rem;
+                border-radius: var(--radius-lg);
+            }
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            .section-title h2 {
+                font-size: 1.7rem;
+            }
+            .site-title {
+                font-size: 1.35rem;
+            }
+            .game-grid {
+                grid-template-columns: 1fr;
+                gap: 1.3rem;
+            }
+            .card {
+                padding: 1.4rem 1.2rem 1.2rem 1.2rem;
+                border-radius: var(--radius-sm);
+            }
+            .section-block {
+                padding: 1.5rem 1rem;
+                border-radius: var(--radius-md);
+            }
+            .badge {
+                font-size: 1.1rem !important;
+                padding: 0.5rem 1.4rem !important;
+            }
+            .icon-emojii {
+                width: 3rem;
+                height: 3rem;
+                font-size: 1.8rem;
+                border-radius: 1.2rem;
+            }
         }
-
-        .div {
-            background-color: #dfd4f1;
-            text-align: center;
-            border-radius: 20px;
+        @media (max-width: 480px) {
+            body {
+                padding: 0.8rem 0.5rem;
+            }
+            .no-login-hub {
+                padding: 1.4rem 0.8rem;
+                border-radius: var(--radius-md);
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .section-title h2 {
+                font-size: 1.4rem;
+            }
+            .card {
+                padding: 1.1rem 0.9rem 1rem 0.9rem;
+                border-radius: 1rem;
+            }
+            .site-title {
+                font-size: 1.15rem;
+            }
+            .description {
+                font-size: 0.85rem;
+            }
+            .feature-tags .tag {
+                font-size: 0.7rem;
+                padding: 0.22rem 0.7rem;
+            }
+            .action-button {
+                font-size: 0.85rem;
+                padding: 0.55rem 0.85rem;
+            }
         }
     </style>
 </head>
 <body>
+
+    <div class="floating-geo polygon1"></div>
+    <div class="floating-geo polygon2"></div>
+    <div class="floating-geo polygon3"></div>
+
     <div class="no-login-hub">
         <div class="header">
-            <h1>🎮 免登录·游戏 depot</h1>
+            <h1>🎮 免登录 · 游戏 Depot</h1>
             <div class="badge">
                 ✨ 打开即玩 · 无需注册 <span>0 门槛</span>
             </div>
         </div>
-        <div class="div">
-        <h2>推荐游戏网站</h2>
-        <!-- 卡片网格 —— 八个可靠免登录站点 (已移除Game Jolt) -->
-        <div class="game-grid">
-            <!-- 1. CrazyGames · 含多人/单人混合 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🎲</div>
-                    <div class="site-title">CrazyGames</div>
-                </div>
-                <div class="description">
-                    超过2000款免费网页游戏，无需注册。包含大量单人、双人及多人竞技游戏。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag mixed-player">单人/多人</span>
-                    <span class="tag">热门排行</span>
-                </div>
-                <a href="https://www.crazygames.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    即点即玩 <span class="arrow">→</span>
-                </a>
-            </div>
 
-            <!-- 2. Poki · 以单人为主，也有多人 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🍃</div>
-                    <div class="site-title">Poki</div>
-                </div>
-                <div class="description">
-                    极简设计，数千种游戏全都不需要登录。单人冒险、双人对抗都可直接玩。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag mixed-player">单人/多人</span>
-                    <span class="tag">全平台</span>
-                </div>
-                <a href="https://poki.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    开始游戏 <span class="arrow">→</span>
-                </a>
+        <!-- ========== 推荐游戏网站 ========== -->
+        <div class="section-block">
+            <div class="section-title">
+                <h2>🌐 推荐游戏网站</h2>
             </div>
-
-            <!-- 3. Armor Games · 经典单人为主 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🛡️</div>
-                    <div class="site-title">Armor Games</div>
-                </div>
-                <div class="description">
-                    老牌游戏站，大量优质Web游戏。多为单人策略、解谜、RPG，也有部分多人。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag single-player">单人为主</span>
-                    <span class="tag">经典游戏</span>
-                </div>
-                <a href="https://armorgames.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    进入 Arcade <span class="arrow">→</span>
-                </a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="site-title">小霸王游戏</div>
-                </div>
-                <div class="description">
-                    红白机,FC游戏,FC游戏在线玩,FC游戏联机,红白机,nes游戏,nes游戏,nes游戏在线玩,支持联机
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag single-player">单人为主</span>
-                    <span class="tag">经典游戏</span>
-                </div>
-                <a href="https://www.yikm.net" class="action-button" target="_blank" rel="noopener noreferrer">
-                    开始爽玩 <span class="arrow">→</span>
-                </a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="site-title">桌游合集</div>
-                </div>
-                <div class="description">
-                    狼人杀，谁是卧底，五子棋，井字棋，支持联机
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag single-player">多人</span>
-                    <span class="tag">经典游戏</span>
-                </div>
-                <a href="https://game.hullqin.cn/" class="action-button" target="_blank" rel="noopener noreferrer">
-                    开始爽玩 <span class="arrow">→</span>
-                </a>
-            </div>
-
-
-            <!-- 4. Y8 · 强项是双人/多人同屏 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🎡</div>
-                    <div class="site-title">Y8.com</div>
-                </div>
-                <div class="description">
-                    超大型游戏库，尤其以双人同机、多人竞技游戏闻名，也有丰富单人游戏。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag multi-player">多人同屏</span>
-                    <span class="tag">海量库</span>
-                </div>
-                <a href="https://www.y8.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    欢乐即玩 <span class="arrow">→</span>
-                </a>
-            </div>
-
-            <!-- 5. Addicting Games · 单人/混合 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">👾</div>
-                    <div class="site-title">Addicting Games</div>
-                </div>
-                <div class="description">
-                    老牌免登录游戏站，动作、益智、休闲。既有单人挑战也有多人小游戏。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag mixed-player">单人/多人</span>
-                    <span class="tag">复古新奇</span>
-                </div>
-                <a href="https://www.addictinggames.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    开始上瘾 <span class="arrow">→</span>
-                </a>
-            </div>
-
-            <!-- 6. AGame.com · 以单人为主 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🕹️</div>
-                    <div class="site-title">AGame.com</div>
-                </div>
-                <div class="description">
-                    纯网页游戏合集，赛车、射击、解谜。多为单人体验，也有少量多人联机。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag single-player">单人为主</span>
-                    <span class="tag">轻竞速</span>
-                </div>
-                <a href="https://www.agame.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    无锁即玩 <span class="arrow">→</span>
-                </a>
-            </div>
-
-            <!-- 7. Kongregate · 精品独立游戏社区 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🏆</div>
-                    <div class="site-title">Kongregate</div>
-                </div>
-                <div class="description">
-                    庞大的独立游戏社区，数千款游戏带成就系统。无需登录即可玩，多人/单人皆备。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag mixed-player">单人/多人</span>
-                    <span class="tag">成就系统</span>
-                </div>
-                <a href="https://www.kongregate.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    探索游戏 <span class="arrow">→</span>
-                </a>
-            </div>
-
-            <!-- 8. Miniclip · 经典休闲游戏平台 -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">⚽</div>
-                    <div class="site-title">Miniclip</div>
-                </div>
-                <div class="description">
-                    全球知名休闲游戏站，8 Ball Pool等经典作品。大部分游戏可直接玩，无需登录。
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">免登录</span>
-                    <span class="tag multi-player">多人竞技</span>
-                    <span class="tag">经典IP</span>
-                </div>
-                <a href="https://www.miniclip.com" class="action-button" target="_blank" rel="noopener noreferrer">
-                    立即体验 <span class="arrow">→</span>
-                </a>
-            </div>
-            </div>
-            </div>
-            <!--bot machines-->
-            <div class="div">
-                <h2>推荐网页游戏</h2>
-                <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🏆</div>
-                    <div class="site-title">Assault Bots</div>
-                </div>
-                <div class="description">
-                    知名机甲射击游戏,可单人、多人匹配、和多人同房,包含多种游戏玩法(来自于crazy game)
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">无需手机登录</span>
-                    <span class="tag mixed-player">单人/多人</span>
-                </div>
-                <a href="https://www.crazygames.com//game/bot-machines" class="action-button" target="_blank" rel="noopener noreferrer">
-                    快速开始 <span class="arrow">→</span>
-                </a>
-                <a href="https://mingyuemc.github.io/game/password.html" class="action-button" target="_blank" rel="noopener noreferrer">
-                    查询账号密码<span class="arrow">→</span>
-                </a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🏆</div>
-                    <div class="site-title">逃离物理卷联机版(正在测试)</div>
-                </div>
-                <div class="description">
-                    知名scratch游戏(来自于ccw.site)
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">无需手机登录</span>
-                    <span class="tag mixed-player">单人/多人</span>
-                </div>
-                <a href="https://mingyuemc.github.io/game/taoliwulijuanlianjiban.html" class="action-button" target="_blank" rel="noopener noreferrer">
-                    快速开始 <span class="arrow">→</span>
-                </a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🏆</div>
-                    <div class="site-title">uno</div>
-                </div>
-                <div class="description">
-                    知名桌游(来自于桌游合集)
-                </div>
-                <div class="feature-tags">
-                    <span class="tag mixed-player">多人</span>
-                </div>
-                
-                <a href="https://www.bilibili.com/video/BV1vB4y117de/?vd_source=e2d5612b0fcb3cd294fe18eb6d9ad9c8" class="action-button" target="_blank" rel="noopener noreferrer">
-                    查看规则1 <span class="arrow">→</span>
-                </a>
-                <a href="https://www.bilibili.com/video/BV1cqhHz4EHc/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=e2d5612b0fcb3cd294fe18eb6d9ad9c8" class="action-button" target="_blank" rel="noopener noreferrer">
-                    查看规则2 <span class="arrow">→</span>
-                </a>
-                <a href="https://game.hullqin.cn/uno" class="action-button" target="_blank" rel="noopener noreferrer">
-                    开始游玩<span class="arrow">→</span>
-                </a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🏆</div>
-                    <div class="site-title">basketball legends 2020</div>
-                </div>
-                <div class="description">
-                    知名篮球游戏,可单人、多人同房(来自于crazy game)
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">无需登录</span>
-                    <span class="tag mixed-player">单人/多人</span>
-                </div>
-                <a href="https://www.crazygames.com/game/basketball-legends-2020" class="action-button" target="_blank" rel="noopener noreferrer">
-                    快速开始 <span class="arrow">→</span>
-                </a>
-            </div>
-
-                <div class="card">
-                <div class="card-header">
-                    <div class="icon-emojii">🏆</div>
-                    <div class="site-title">逃离物理卷</div>
-                </div>
-                <div class="description">
-                    知名scratch游戏(来自于共创世界ccw.site)
-                </div>
-                <div class="feature-tags">
-                    <span class="tag nologin-highlight">无需登录</span>
-                    <span class="tag mixed-player">单人</span>
-                </div>
-                <a href="https://mingyuemc.github.io/game/taoliwulijuan.html" class="action-button" target="_blank" rel="noopener noreferrer">
-                    快速开始 <span class="arrow">→</span>
-                </a>
-            </div>
-
-            </div>
-
-            <div class="div">
-                <h2>推荐游戏下载</h2>
+            <div class="game-grid">
+                <!-- CrazyGames -->
                 <div class="card">
                     <div class="card-header">
-                        <div class="site-title">Minecraft(我的世界)</div>
+                        <div class="icon-emojii">🎲</div>
+                        <div class="site-title">CrazyGames</div>
                     </div>
                     <div class="description">
-                        知名沙盒游戏，包含多种玩法
+                        超过2000款免费网页游戏，无需注册。包含大量单人、双人及多人竞技游戏。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag mixed-player">单人/多人</span>
+                        <span class="tag">热门排行</span>
+                    </div>
+                    <a href="https://www.crazygames.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        即点即玩 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- Poki -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🍃</div>
+                        <div class="site-title">Poki</div>
+                    </div>
+                    <div class="description">
+                        极简设计，数千种游戏全都不需要登录。单人冒险、双人对抗都可直接玩。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag mixed-player">单人/多人</span>
+                        <span class="tag">全平台</span>
+                    </div>
+                    <a href="https://poki.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        开始游戏 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- Armor Games -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🛡️</div>
+                        <div class="site-title">Armor Games</div>
+                    </div>
+                    <div class="description">
+                        老牌游戏站，大量优质Web游戏。多为单人策略、解谜、RPG，也有部分多人。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag single-player">单人为主</span>
+                        <span class="tag">经典游戏</span>
+                    </div>
+                    <a href="https://armorgames.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        进入 Arcade <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- 小霸王游戏 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">👾</div>
+                        <div class="site-title">小霸王游戏</div>
+                    </div>
+                    <div class="description">
+                        红白机、FC游戏在线玩，支持联机。NES经典游戏一站式体验。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag single-player">单人为主</span>
+                        <span class="tag">经典游戏</span>
+                    </div>
+                    <a href="https://www.yikm.net" class="action-button" target="_blank" rel="noopener noreferrer">
+                        开始爽玩 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- 桌游合集 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">♟️</div>
+                        <div class="site-title">桌游合集</div>
+                    </div>
+                    <div class="description">
+                        狼人杀、谁是卧底、五子棋、井字棋等经典桌游，支持联机对战。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag multi-player">多人</span>
+                        <span class="tag">经典游戏</span>
+                    </div>
+                    <a href="https://game.hullqin.cn/" class="action-button" target="_blank" rel="noopener noreferrer">
+                        开始爽玩 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- Y8 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🎡</div>
+                        <div class="site-title">Y8.com</div>
+                    </div>
+                    <div class="description">
+                        超大型游戏库，尤其以双人同机、多人竞技游戏闻名，也有丰富单人游戏。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag multi-player">多人同屏</span>
+                        <span class="tag">海量库</span>
+                    </div>
+                    <a href="https://www.y8.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        欢乐即玩 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- Addicting Games -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">👾</div>
+                        <div class="site-title">Addicting Games</div>
+                    </div>
+                    <div class="description">
+                        老牌免登录游戏站，动作、益智、休闲。既有单人挑战也有多人小游戏。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag mixed-player">单人/多人</span>
+                        <span class="tag">复古新奇</span>
+                    </div>
+                    <a href="https://www.addictinggames.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        开始上瘾 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- AGame -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🕹️</div>
+                        <div class="site-title">AGame.com</div>
+                    </div>
+                    <div class="description">
+                        纯网页游戏合集，赛车、射击、解谜。多为单人体验，也有少量多人联机。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag single-player">单人为主</span>
+                        <span class="tag">轻竞速</span>
+                    </div>
+                    <a href="https://www.agame.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        无锁即玩 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- Kongregate -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🏆</div>
+                        <div class="site-title">Kongregate</div>
+                    </div>
+                    <div class="description">
+                        庞大的独立游戏社区，数千款游戏带成就系统。无需登录即可玩，多人/单人皆备。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag mixed-player">单人/多人</span>
+                        <span class="tag">成就系统</span>
+                    </div>
+                    <a href="https://www.kongregate.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        探索游戏 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- Miniclip -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">⚽</div>
+                        <div class="site-title">Miniclip</div>
+                    </div>
+                    <div class="description">
+                        全球知名休闲游戏站，8 Ball Pool等经典作品。大部分游戏可直接玩，无需登录。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag multi-player">多人竞技</span>
+                        <span class="tag">经典IP</span>
+                    </div>
+                    <a href="https://www.miniclip.com" class="action-button" target="_blank" rel="noopener noreferrer">
+                        立即体验 <span class="arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 推荐网页游戏 ========== -->
+        <div class="section-block">
+            <div class="section-title">
+                <h2>🎯 推荐网页游戏</h2>
+            </div>
+            <div class="game-grid">
+
+                <!-- 几何冲刺 -->
+                <div class="card geo-dash-card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🔺</div>
+                        <div class="site-title">几何冲刺</div>
+                        <span class="geo-badge">热门推荐</span>
+                    </div>
+                    <div class="description">
+                        全球知名节奏跑酷游戏！跟随电子音乐节拍跳跃、飞行、翻转，躲避几何障碍。极简操作，极致挑战，令人上瘾的关卡设计。
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">免登录</span>
+                        <span class="tag single-player">单人闯关</span>
+                        <span class="tag">节奏跑酷</span>
+                        <span class="tag">几何风格</span>
+                    </div>
+                    <a href="https://geometrydashonline.io/geometry-dash-online" class="action-button" target="_blank" rel="noopener noreferrer">
+                        🔥 开始挑战 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- Assault Bots -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🤖</div>
+                        <div class="site-title">Assault Bots</div>
+                    </div>
+                    <div class="description">
+                        知名机甲射击游戏，可单人、多人匹配和多人同房，包含多种游戏玩法。<br><small style="color:#6b7d90;">（来自 CrazyGames）</small>
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">无需手机登录</span>
+                        <span class="tag mixed-player">单人/多人</span>
+                    </div>
+                    <div class="button-group">
+                        <a href="https://www.crazygames.com/game/bot-machines" class="action-button" target="_blank" rel="noopener noreferrer">
+                            快速开始 <span class="arrow">→</span>
+                        </a>
+                        <a href="https://mingyuemc.github.io/game/password.html" class="action-button" target="_blank" rel="noopener noreferrer">
+                            查询账号密码 <span class="arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- UNO -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🃏</div>
+                        <div class="site-title">UNO</div>
+                    </div>
+                    <div class="description">
+                        知名桌游，经典卡牌对战。<br><small style="color:#6b7d90;">（来自 桌游合集）</small>
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag multi-player">多人</span>
+                        <span class="tag">卡牌游戏</span>
+                    </div>
+                    <div class="button-group">
+                        <a href="https://www.bilibili.com/video/BV1vB4y117de/?vd_source=e2d5612b0fcb3cd294fe18eb6d9ad9c8" class="action-button" target="_blank" rel="noopener noreferrer">
+                            查看规则1 <span class="arrow">→</span>
+                        </a>
+                        <a href="https://www.bilibili.com/video/BV1cqhHz4EHc/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=e2d5612b0fcb3cd294fe18eb6d9ad9c8" class="action-button" target="_blank" rel="noopener noreferrer">
+                            查看规则2 <span class="arrow">→</span>
+                        </a>
+                        <a href="https://game.hullqin.cn/uno" class="action-button" target="_blank" rel="noopener noreferrer">
+                            开始游玩 <span class="arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Basketball Legends 2020 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">🏀</div>
+                        <div class="site-title">Basketball Legends 2020</div>
+                    </div>
+                    <div class="description">
+                        知名篮球游戏，可单人、多人同房对战。<br><small style="color:#6b7d90;">（来自 CrazyGames）</small>
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">无需登录</span>
+                        <span class="tag mixed-player">单人/多人</span>
+                    </div>
+                    <a href="https://www.crazygames.com/game/basketball-legends-2020" class="action-button" target="_blank" rel="noopener noreferrer">
+                        快速开始 <span class="arrow">→</span>
+                    </a>
+                </div>
+
+                <!-- 逃离物理卷 (单人版) -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">📘</div>
+                        <div class="site-title">逃离物理卷</div>
+                    </div>
+                    <div class="description">
+                        知名 Scratch 游戏，单人解谜闯关。<br><small style="color:#6b7d90;">（来自 共创世界 ccw.site）</small>
+                    </div>
+                    <div class="feature-tags">
+                        <span class="tag nologin-highlight">无需登录</span>
+                        <span class="tag single-player">单人</span>
+                    </div>
+                    <a href="https://mingyuemc.github.io/game/taoliwulijuan.html" class="action-button" target="_blank" rel="noopener noreferrer">
+                        快速开始 <span class="arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 推荐游戏下载 ========== -->
+        <div class="section-block">
+            <div class="section-title">
+                <h2>📥 推荐游戏下载</h2>
+            </div>
+            <div class="game-grid">
+                <!-- Minecraft -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-emojii">⛏️</div>
+                        <div class="site-title">Minecraft (我的世界)</div>
+                    </div>
+                    <div class="description">
+                        知名沙盒游戏，包含多种玩法，创造与生存的无限可能。
                     </div>
                     <div class="feature-tags">
                         <span class="tag nologin-highlight">无需付费</span>
                         <span class="tag mixed-player">单人/多人</span>
                     </div>
                     <a href="https://afdian.com/p/0164034c016c11ebafcb52540025c377" class="action-button" target="_blank" rel="noopener noreferrer">
-                    下载 <span class="arrow">→</span>
+                        下载 <span class="arrow">→</span>
                     </a>
-
                 </div>
-
-                </div>
-
             </div>
-
         </div>
 
-        <!-- 底部强调 -->
+        <!-- 底部说明 -->
         <div class="foot-note">
             ⚡ 所有推荐站均支持 <strong>直接访问 · 无强制登录</strong>  |  图标标识: 👤单人  👥多人  👤👥混合 ⚡
         </div>
